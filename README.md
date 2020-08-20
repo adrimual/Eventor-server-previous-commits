@@ -21,7 +21,6 @@ If you enjoy driving, GoRide is your App. Here you will be able to create or joi
 - **Joining events** As a registered user I can Join an event and see the participant's profile.
 - **Add an event** As a user I can create new riding events.
 - **User profile** As a logged user I can see, edit or delete my profile, and see other rider profiles. 
-- **Create Events** As a user I can create new events.
 - **User Calendar** As a user I can see a calendar with the events I joined previously.
 - **404:** As an anon/user I can see a 404 page if I try to reach a page that does not exist
 
@@ -31,33 +30,29 @@ If you enjoy driving, GoRide is your App. Here you will be able to create or joi
 
 
 
-## Endpoints
+## Endpoints (REST API)
 
-| Method | Path                                   | Description                          |
-| ------ | -------------------------------------- | ------------------------------------ |
-| post   | /signup                                | Register a new user                  |
-| post   | /login                                 | Sign the user in                     |
-| post   | /logout                                | Kill the current session             |
-| get    | /loggedin                              | Check if an user is logged in        |
-| post   | /api/files/upload                      | Upload pictures to cloudinar         |
-| get    | /api/user/event/join/:eventId/:id      | Allows an user to join an event      |
-| put    | /api/user/event/leave/:eventId/:id     | Allows an user to leave an event     |
-| get    | /api/user/event/getAllEvents           | Get all the events                   |
-| get    | /api/user/event/getAllFutureEvents     | Get all future events                |
-| get    | /api/user/event/getOwner/:eventId      | Get the owner of an event            |
-| get    | /api/user/event/:userId/owned          | Get events where user is owner       |
-| get    | /api/user/event/:userId/all/future     | Get all future events of an user     |
-| put    | /api/user/event/:userId/all            | Get all events of an user            |
-| get    | /api/user/event/:userId/participant    | Get events where user is participant |
-| post   | /api/user/event/create/:id             | Create an event                      |
-| delete | /api/user/event/delete/:eventId/:id    | Delete an event                      |
-| get    | /api/user/event/event/:userId          | Get one event                        |
-| get    | /api/user/event/event/name/:eventName  | Get event by name                    |
-| put    | /api/user/event/event/:eventId/:id     | Update event                         |
-| get    | /api/user/event/live/pictures/:eventId | Get pictures of an event             |
-| get    | /api/user/event/:userId                | Get all events of a person           |
-| put    | /api/user/profile/edit/:id             | Edit profile                         |
-| get    | /api/user/profile/:id                  | Get user details                     |
+| Method | Path                           | Body                                                         | Description                           |
+| ------ | ------------------------------ | ------------------------------------------------------------ | ------------------------------------- |
+| post   | /auth/signup                   |                                                              | Register a new user                   |
+| post   | /auth/login                    |                                                              | Sign the user in                      |
+| post   | /auth/logout                   |                                                              | Log the user out. Destroy the session |
+| get    | /auth/me                       |                                                              | Check if an user is logged in         |
+| post   | /api/files                     |                                                              | Upload pictures to cloudinary         |
+| put    | /api/event/join/:eventId/:id   |                                                              | Allows an user to join an event       |
+| put    | /api/event/leave/:eventId/:id  |                                                              | Allows an user to leave an event      |
+| get    | /api/event                     |                                                              | Get all the events                    |
+| get    | /api/event/future              | via req.query                                                | Get all future events                 |
+| get    | /api/event/:eventId            |                                                              | Get an event                          |
+| get    | /api/event/:userId/participant |                                                              | Get events where user is participant  |
+| post   | /api/event                     | {name, avatar, comments, pictures, description, startTime, endTime, city, participants} | Create an event                       |
+| delete | /api/event/:eventId            |                                                              | Delete an event                       |
+| get    | /api/event/name/:eventName     |                                                              | Get event by name                     |
+| put    | /api/event/:eventId            | {name, avatar, comments, pictures, description, startTime, endTime, city, participants} | Update event                          |
+| get    | /api/event/pictures/:eventId   |                                                              | Get pictures of an event              |
+| get    | /api/event/user/:userId        |                                                              | Get all events of a person            |
+| put    | /api/user                      | {username, password, email, avatar, age, genre, vehicle}     | Edit profile                          |
+| get    | /api/user/:id                  |                                                              | Get user details by id                |
 
 
 
@@ -69,7 +64,7 @@ If you enjoy driving, GoRide is your App. Here you will be able to create or joi
 
 Person model
 
-```
+```javascript
 {
     age: {
         type: Number,
@@ -91,7 +86,7 @@ Person model
 
 User model
 
-```
+```javascript
 {
     username: {
         type: String,
@@ -99,22 +94,28 @@ User model
         minlength: 3,
         maxlength: 20
     },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
     password: {
         type: String,
         required: true,
-        minlength: 3
+        minlength: 4
     },
     avatar: {
         type: String, 
         default: "avatar.png"
     },
-    personDetails: { type: Schema.Types.ObjectId, ref: "Person" }
+    personDetails: { type: Schema.Types.ObjectId, ref: "Person" },
+    createdEvents: [{type: Schema.Types.ObjectId, ref: "Event" }]
 }
 ```
 
 Event model
 
-```
+```javascript
 {
 
     owner: { type: Schema.Types.ObjectId, ref: "User" },
