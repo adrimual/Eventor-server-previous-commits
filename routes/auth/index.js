@@ -4,6 +4,8 @@ const passport = require('passport');
 const bcrypt = require('bcrypt');
 //calling models
 const User = require('../../models/user.model');
+const Person = require('../../models/person.model');
+
 
 //SIGN-UP
 router.post('/signup', (req, res, next) => {
