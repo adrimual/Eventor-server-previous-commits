@@ -1,26 +1,44 @@
-const express = require('express');
-const router = express.Router();
-const bcrypt = require('bcrypt');
+const express = require('express')
+const router = express.Router()
+const bcrypt = require("bcrypt")
 const bcryptSalt = 10
-//Models
-const User = require('../../../models/user.model');
-const Person = require('../../../models/person.model');
 
-//get person details
+//Models
+const User = require('../../../models/user.model')
+const Person = require('../../../models/person.model')
+
+
+//Helper functions 
+
+const obtainDetailsUpdate = body => {
+    const elementToChange = {
+        ...body
+    }
+    delete elementToChange.username
+    delete elementToChange.email
+    delete elementToChange.password
+    return elementToChange
+}
+//Endpoints
+
+// get Persondetails
 
 router.get('/personDetails/:id', (req, res, next) => {
-    
+
     Person
         .findById(req.params.id)
         .then(personDet => res.json(personDet))
-        .catch(err=>console.log(err))
+        .catch(error => console.log(error))
 })
-//Endpoints to edit username and password
-
+//edit username and password
 router.post('/edit/:id', (req, res, next) => {
-    const { username, email, password} = req.body;
-    const salt = bcrypt.genSaltSync(bcryptSalt);
-    const hashPass = bcrypt.hashSync(password, salt);
+    const {
+        username,
+        email,
+        password,
+    } = req.body
+    const salt = bcrypt.genSaltSync(bcryptSalt)
+    const hashPass = bcrypt.hashSync(password, salt)
 
     if (!username || !password) {
         res.json({
@@ -28,17 +46,27 @@ router.post('/edit/:id', (req, res, next) => {
         })
         return
     }
-        User
-            .findById(req.params.id)
-            .populate('personDetails')
-            .then((user) => {
-                user.username = username
-                user.email = email
-                user.password = hashPass
-                user.save()
-                return user.personDetails
-            })
-        // .then((response) => res.json(response))
-        .catch(err => next(new Error(err)))
+    User
+        .findByIdAndUpdate(req.params.id, {
+            username,
+            email,
+            password: hashPass
+        })
+        .then(user => {
+            const personModel = {
+                model: Person,
+                id: user.personDetails
+            }
+        })
+        .then(details => details.personModel.findByIdAndUpdate(details.id, obtainDetailsUpdate(req.body), {
+            new: true
+        }))
+        .then(finalUserDetails => {
+            console.log("user updated", finalUserDetails)
+            res.json(finalUserDetails)
+        })
+        .catch(err => console.log(err))
+
 })
+
 module.exports = router
