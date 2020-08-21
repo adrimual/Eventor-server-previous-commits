@@ -6,6 +6,15 @@ const bcryptSalt = 10
 const User = require('../../../models/user.model');
 const Person = require('../../../models/person.model');
 
+//get person details
+
+router.get('/personDetails/:id', (req, res, next) => {
+    
+    Person
+        .findById(req.params.id)
+        .then(personDet => res.json(personDet))
+        .catch(err=>console.log(err))
+})
 //Endpoints to edit username and password
 
 router.post('/edit/:id', (req, res, next) => {
