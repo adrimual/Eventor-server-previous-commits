@@ -19,7 +19,12 @@ const obtainDetailsUpdate = body => {
     delete elementToChange.password
     return elementToChange
 }
-//Endpoints
+
+const updateDetails = (id, body, user) => {
+    user.findByIdAndUpdate(id, obtainDetailsUpdate(body), { new: true })
+        .then(response => response)
+        .catch(err => console.log(err))
+}
 
 // get Persondetails
 
@@ -51,20 +56,14 @@ router.post('/edit/:id', (req, res) => {
             username,
             email,
             password: hashPass
+        }, {new: true})
+        
+        .then(details => {
+            updateDetails(details.id, req.body, details.user)
+            return details.user
         })
-        .then(user => {
-            const personModel = {
-                model: Person,
-                id: user.personDetails
-            }
-        })
-        .then(details => details.personModel.findByIdAndUpdate(details.id, obtainDetailsUpdate(req.body), {
-            new: true
-        }))
-        .then(finalUserDetails => {
-            console.log("user updated", finalUserDetails)
-            res.json(finalUserDetails)
-        })
+        
+        .then(user=> res.json(user))
         .catch(err => console.log(err))
 
 })
