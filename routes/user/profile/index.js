@@ -23,15 +23,15 @@ const obtainDetailsUpdate = body => {
 
 // get Persondetails
 
-router.get('/personDetails/:id', (req, res, next) => {
+router.get('/personDetails/:id', (req, res) => {
 
     Person
         .findById(req.params.id)
         .then(personDet => res.json(personDet))
         .catch(error => console.log(error))
 })
-//edit username and password
-router.post('/edit/:id', (req, res, next) => {
+//edit username, email and password
+router.post('/edit/:id', (req, res) => {
     const {
         username,
         email,
