@@ -5,7 +5,7 @@ const bcryptSalt = 10
 
 //Models
 const User = require('../../../models/user.model')
-const Person = require('../../../models/person.model')
+// const Person = require('../../../models/person.model')
 
 
 //Helper functions 
