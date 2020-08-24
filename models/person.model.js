@@ -15,7 +15,6 @@ const personSchema = new Schema({
                 enum: ["motorbike, car"],
                 minlength: 1,
             },
-            events: [{ type: Schema.Types.ObjectId, ref: "Event" }],
             calendar: [Date],
 })
 
