@@ -22,19 +22,9 @@ const obtainDetailsUpdate = body => {
 
 const updateDetails = (id, body, user) => {
     user.findByIdAndUpdate(id, obtainDetailsUpdate(body), { new: true })
-        .then(response => response)
+        .then(response => console.log(response))
         .catch(err => console.log(err))
 }
-
-// get Persondetails
-
-router.get('/personDetails/:id', (req, res) => {
-
-    Person
-        .findById(req.params.id)
-        .then(personDet => res.json(personDet))
-        .catch(error => console.log(error))
-})
 //edit username, email and password
 router.post('/edit/:id', (req, res) => {
     const {
@@ -62,10 +52,17 @@ router.post('/edit/:id', (req, res) => {
             updateDetails(details.id, req.body, details.user)
             return details.user
         })
-        
         .then(user=> res.json(user))
         .catch(err => console.log(err))
 
 })
 
+// get user details
+router.get('/:id', (req, res) => {
+    User
+        .findById(req.params.id)
+        .populate(details.Person)
+        .then(user => res.json(user))
+        .catch(err=>console.log(err))
+})
 module.exports = router
