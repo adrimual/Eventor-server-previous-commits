@@ -33,11 +33,12 @@ router.post('/signup', (req, res, next) => {
             return;
         }
         const salt = bcrypt.genSaltSync(10);
-        const hashedPass = bcrypt.hashSync(password, salt);
+        const hashPass = bcrypt.hashSync(password, salt);
 
         const aNewUser = new User({
             username: username,
-            password: hashedPass
+            email: email,
+            password: hashPass
         });
         aNewUser.save(err => {
             if (err) {
@@ -53,7 +54,6 @@ router.post('/signup', (req, res, next) => {
                     res.status(500).json({ message: 'Login after signup went bad.' });
                     return;
                 }
-
                 //enviar la informacion del usuario al frontend
                 res.status(200).json(aNewUser);
             });
@@ -92,7 +92,6 @@ router.post('/login', (req, res, next) => {
 });
 
 //LOGOUT
-
 router.post('/logout', (req, res, next) => {
     // req.logout() metodo predefinido de passport
     req.logout();
