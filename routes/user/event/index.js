@@ -126,7 +126,7 @@ router.put('/event/:eventId', (req, res, next) => {
     isFormValidated(req.body, res) &&
     Event
         .findByIdAndUpdate(req.params.eventId, req.body, {new:true})
-        .then(() => res.json(''))
+        .then(response => res.json(response))
         .catch(err => next(err))
 })
 
