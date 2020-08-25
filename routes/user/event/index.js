@@ -114,11 +114,12 @@ router.delete('/delete/:id', (req, res, next) => {
         .catch(err => next(err))
 })
 
-//get one event
+//get an event
 router.get('/event/:userId', (req, res) => {
     Event
         .findById(req.params.userId)
-        .then(() => res.json(''))
+        .populate('owner')
+        .then(response=>res.json(response))
         .catch(err => next(err))
 })
 
