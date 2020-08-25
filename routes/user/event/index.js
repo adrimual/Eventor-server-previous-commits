@@ -13,10 +13,32 @@ router.post('/create', (req, res, next) => {
         .then(response => console.log(response.data))
         .catch(err => next(err))
 })
-router.get('/:person_id', (req, res) => {
+//get one event
+router.get('/event/:userId', (req, res) => {
     Event
-        .find( {owner: req.params.person_id})
+        .findById(req.params.userId)
         .then(response => res.json(response))
         .catch(err => next(err))
 })
+
+router.post('/event/:userId', (req, res, next) => {
+
+    Event
+        .findByIdAndUpdate(req.params.userId, req.body)
+        .then(response => res.json(response))
+        .catch(err => next(err))
+
+})
+
+//get all events of a person
+
+router.get('/:userId', (req, res, next)=> {
+
+    Event
+        .find( {owner: req.params.userId})
+        .then(response => res.json(response))
+        .catch(err => next(err))
+
+})
+
 module.exports = router
