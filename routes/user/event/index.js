@@ -27,7 +27,7 @@ router.post('/create', (req, res, next) => {
         .catch(err => next(err))
 })
 //delete event
-router.get('/delete/:id', (req, res, next) => {
+router.delete('/delete/:id', (req, res, next) => {
     Event
         .findByIdAndRemove(req.params.id)
         .then(() => res.json(''))
@@ -40,7 +40,7 @@ router.get('/event/:userId', (req, res) => {
         .then(() => res.json(''))
         .catch(err => next(err))
 })
-router.post('/event/:eventId', (req, res, next) => {
+router.put('/event/:eventId', (req, res, next) => {
     isFormValidated(req.body, res) &&
     Event
         .findByIdAndUpdate(req.params.eventId, req.body, {new:true})
