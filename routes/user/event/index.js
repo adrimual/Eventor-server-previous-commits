@@ -14,7 +14,7 @@ const Event = require('../../../models/event.model')
 const isFormValidated = (event, res) => {
     return validationHandler.areRequiredFieldsFilled(event, res, "name", "description", "date", "city") &&
         validationHandler.isFieldLongEnough(event.name, res, 2, "name") &&
-        validationHandler.isFieldTooLong(event.name, res, 40, "description") &&
+        validationHandler.isFieldLongEnough(event.description, res, 40, "description") &&
         validationHandler.isFieldTooLong(event.description, res, 500, "description") &&
         validationHandler.isFutureDate(event.date, res)
 }
