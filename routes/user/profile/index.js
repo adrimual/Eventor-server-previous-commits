@@ -6,6 +6,8 @@ const bcryptSalt = 10
 //Models
 const User = require('../../../models/user.model')
 // const Person = require('../../../models/person.model')
+const ValidationHandler = require("../../../validationHandler")
+const validationHandler = new ValidationHandler()
 
 
 //Helper functions 
@@ -19,14 +21,21 @@ const obtainDetailsUpdate = body => {
     delete elementToChange.password
     return elementToChange
 }
-const areRequiredFieldsFilled = (body, ...fields) => {
-    console.log(body, fields)
- return fields.every(field => body[field] && body[field].length > 0 || body[field] > 0)
-
+const isUserFormValid = (model, body, res) => {
+    if (model == Person && !validationHandler.areRequiredFieldsFilled(body, res, "interests")) {
+        return false
+    }
+    if (model == Company && !validationHandler.isFieldTooLong(body.description, res, 500, "description")) {
+        return false
+    }
+    if (model == Company && !validationHandler.isFieldLongEnough(body.address, res, 8, "address")) {
+        return false
+    }
+    return true
 }
 const updateDetails = (id, body, user) => {
     user.findByIdAndUpdate(id, obtainDetailsUpdate(body), { new: true })
-        .then(response => console.log(response))
+        .then(response => response)
         .catch(err => console.log(err))
 }
 //edit username, email and password
@@ -44,10 +53,11 @@ router.post('/edit/:id', (req, res) => {
             user.save()
             return user
         }) 
-        
         .then(details => {
-            updateDetails(details.id, req.body, details.user)
-            return details.user
+            if (isUserFormValid(details.model, req.body, res)) {
+                updateDetails(details.id, req.body, details.model)
+                return details.user
+            }
         })
         .then(user=> res.json(user))
         .catch(err => console.log(err))
