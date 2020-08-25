@@ -50,6 +50,7 @@ router.put('/leave/:eventId/:userId', (req, res, next) => {
         .catch(err => next(err))
 })
 
+//Get all events
 router.get('/getAllEvents', (req, res, next) => {
     Event
         .find()
@@ -75,6 +76,14 @@ router.get('/:userId/owned', (req, res, next) => {
         .catch(err => next(err))
 })
 
+// get all events of a user
+router.get('/:userId/all', (req, res, next) => {
+    Event
+        .find()
+        .then(response => res.json(response.filter(event => event.participants.includes(req.params.userId))))
+        .catch(err => next(err))
+})
+
 // get events where user is participant
 router.get('/:userId/participant', (req, res, next) => {
     Event
@@ -86,6 +95,7 @@ router.get('/:userId/participant', (req, res, next) => {
         })
         .catch(err => next(err))
 })
+
 //Create an Event
 router.post('/create', (req, res, next) => {
     isFormValidated(req.body, res) &&
@@ -94,6 +104,7 @@ router.post('/create', (req, res, next) => {
         .then(response => console.log(response.data))
         .catch(err => next(err))
 })
+
 //delete event
 router.delete('/delete/:id', (req, res, next) => {
     Event
@@ -101,6 +112,7 @@ router.delete('/delete/:id', (req, res, next) => {
         .then(() => res.json(''))
         .catch(err => next(err))
 })
+
 //get one event
 router.get('/event/:userId', (req, res) => {
     Event
@@ -108,6 +120,7 @@ router.get('/event/:userId', (req, res) => {
         .then(() => res.json(''))
         .catch(err => next(err))
 })
+
 //updating an event
 router.put('/event/:eventId', (req, res, next) => {
     isFormValidated(req.body, res) &&
@@ -116,6 +129,7 @@ router.put('/event/:eventId', (req, res, next) => {
         .then(() => res.json(''))
         .catch(err => next(err))
 })
+
 //get all events of a person
 router.get('/:userId', (req, res, next)=> {
     Event
