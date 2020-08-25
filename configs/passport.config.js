@@ -34,12 +34,12 @@ module.exports = app => {
             .then(user => {
                 if (!user) {
                     return next(null, false, {
-                        message: "Nombre de usuario incorrecto"
+                        message: "Invalid username"
                     })
                 }
                 if (!bcrypt.compareSync(password, user.password)) {
                     return next(null, false, {
-                        message: "Contraseña incorrecta"
+                        message: "Invalid password"
                     })
                 }
                 return next(null, user)
