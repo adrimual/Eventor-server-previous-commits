@@ -39,7 +39,7 @@ const updateDetails = (id, body, user) => {
         .catch(err => console.log(err))
 }
 //edit username, email and password
-router.post('/edit/:id', (req, res) => {
+router.put('/edit/:id', (req, res) => {
     const {username, email, password} = req.body
     User
         .findById(req.params.id)
