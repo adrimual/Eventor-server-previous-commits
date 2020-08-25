@@ -12,11 +12,12 @@ const Event = require('../../../models/event.model')
 
 //Helper functions
 const isFormValidated = (event, res) => {
-    return validationHandler.areRequiredFieldsFilled(event, res, "name", "description", "date", "city") &&
+    return validationHandler.areRequiredFieldsFilled(event, res, "name", "description", "startTime", "endTime", "city") &&
         validationHandler.isFieldLongEnough(event.name, res, 2, "name") &&
         validationHandler.isFieldLongEnough(event.description, res, 40, "description") &&
         validationHandler.isFieldTooLong(event.description, res, 500, "description") &&
-        validationHandler.isFutureDate(event.date, res)
+        validationHandler.isFutureDate(event.startTime, res) &&
+        validationHandler.isFutureDate(event.endTime, res)
 }
 
 //to join an event
