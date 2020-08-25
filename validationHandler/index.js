@@ -35,12 +35,11 @@ class ValidationHandler {
         }
         return true
     }
-    isFutureDate = (date, res) => {
-        const today = new Date()
+    isFutureDate = (present, date, res) => {
         const formDate = new Date(date)
-        if (formDate < today) {
+        if (formDate < present) {
             res.status(400).json({
-                message: `The date selected should be a future date.`
+                message: `You need to select a future date.`
             })
             return false
         }

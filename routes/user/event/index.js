@@ -16,8 +16,8 @@ const isFormValidated = (event, res) => {
         validationHandler.isFieldLongEnough(event.name, res, 2, "name") &&
         validationHandler.isFieldLongEnough(event.description, res, 40, "description") &&
         validationHandler.isFieldTooLong(event.description, res, 500, "description") &&
-        validationHandler.isFutureDate(event.startTime, res) &&
-        validationHandler.isFutureDate(event.endTime, res)
+        validationHandler.isFutureDate(new Date(), event.startTime, res) &&
+        validationHandler.isFutureDate(new Date(event.startTime), event.endTime, res)
 }
 
 //to join an event
