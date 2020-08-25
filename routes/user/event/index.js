@@ -18,6 +18,12 @@ const isFormValidated = (event, res) => {
         validationHandler.isFieldTooLong(event.description, res, 500, "description") &&
         validationHandler.isFutureDate(event.date, res)
 }
+router.get('/getAllEvents', (req, res, next) => {
+    Event
+        .find()
+        .then(response => res.json(response))
+        .catch(err => next(err))
+})
 //Create an Event
 router.post('/create', (req, res, next) => {
     isFormValidated(req.body, res) &&
