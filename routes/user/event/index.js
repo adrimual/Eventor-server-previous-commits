@@ -24,8 +24,8 @@ router.get('/event/:userId', (req, res) => {
 router.post('/event/:userId', (req, res, next) => {
 
     Event
-        .findByIdAndUpdate(req.params.userId, req.body)
-        .then(response => res.json(response))
+        .findByIdAndUpdate(req.params.userId, req.body, {new:true})
+        .then(response => console.log('event edited ', response))
         .catch(err => next(err))
 
 })
