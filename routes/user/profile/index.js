@@ -41,7 +41,6 @@ router.post('/edit/:id', (req, res) => {
         .then(user => {
             user.username = username;
             if (password != "") {
-                console.log("Changing password");
                 const salt = bcrypt.genSaltSync(bcryptSalt)
                 user.password = bcrypt.hashSync(password, salt);
             }
