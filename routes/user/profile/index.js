@@ -19,7 +19,11 @@ const obtainDetailsUpdate = body => {
     delete elementToChange.password
     return elementToChange
 }
+const areRequiredFieldsFilled = (body, ...fields) => {
+    console.log(body, fields)
+ return fields.every(field => body[field] && body[field].length > 0 || body[field] > 0)
 
+}
 const updateDetails = (id, body, user) => {
     user.findByIdAndUpdate(id, obtainDetailsUpdate(body), { new: true })
         .then(response => console.log(response))
@@ -27,19 +31,12 @@ const updateDetails = (id, body, user) => {
 }
 //edit username, email and password
 router.post('/edit/:id', (req, res) => {
-    const {
-        username,
-        email,
-        password,
-    } = req.body
-    if (!username) {
-    res.json({message: "Introduce a valid username"})
-}
-   
+    const {username, email, password} = req.body
     User
         .findById(req.params.id)
         .then(user => {
             user.username = username;
+            user.email = email;
             if (password != "") {
                 const salt = bcrypt.genSaltSync(bcryptSalt)
                 user.password = bcrypt.hashSync(password, salt);
