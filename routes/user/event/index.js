@@ -13,32 +13,32 @@ router.post('/create', (req, res, next) => {
         .then(response => console.log(response.data))
         .catch(err => next(err))
 })
+//delete event
+router.get('/delete/:id', (req, res, next) => {
+    Event
+        .findByIdAndRemove(req.params.id)
+        .then(() => res.json(''))
+        .catch(err => next(err))
+})
 //get one event
 router.get('/event/:userId', (req, res) => {
     Event
         .findById(req.params.userId)
-        .then(response => res.json(response))
+        .then(() => res.json(''))
         .catch(err => next(err))
 })
-
 router.post('/event/:userId', (req, res, next) => {
-
     Event
         .findByIdAndUpdate(req.params.userId, req.body, {new:true})
-        .then(response => console.log('event edited ', response))
+        .then(() => res.json(''))
         .catch(err => next(err))
-
 })
-
 //get all events of a person
-
 router.get('/:userId', (req, res, next)=> {
-
     Event
         .find( {owner: req.params.userId})
         .then(response => res.json(response))
         .catch(err => next(err))
-
 })
 
 module.exports = router
