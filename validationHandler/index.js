@@ -44,10 +44,10 @@ class ValidationHandler {
         }
         return true
     }
-    isNameUnique = (model, name, res) => {
+    isNameUnique = (model, name, res, eventId) => {
     return model.findOne({ name })
         .then(response => {
-            if (response) {
+            if (response && response._id !=eventId) {
                 res.status(400).json({ message: `The name you choose is already taken.` })
                 return false
             }
@@ -58,7 +58,7 @@ class ValidationHandler {
 }
 
     isLocationSelected = (location, res) => {
-        if (location.address.length === 0 || location.coordinates.lat.length === 0 || location.coordinates.lng.length === 0 ) {
+        if (location.address.length === 0 || location.coordinates.lat.length === 0 || location.coordinates.lng.length === 0){
             res.status(400).json({ message: `Select a valid address.` })
             return false
         }
