@@ -20,7 +20,7 @@ const userSchema = new Schema({
         },
         avatar: {
             type: String,
-            default: "avatar.png"
+            default: "https://res.cloudinary.com/dlsnvevxk/image/upload/v1595681654/avatar/profile%20icon.png.png"
         },
         personDetails: {
             type: Schema.Types.ObjectId,

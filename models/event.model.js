@@ -10,10 +10,10 @@ const eventSchema = new Schema({
                 minlength: 2,
                 unique: true,
             },
-            avatar: {
-                type: String,
-                default: "avatar.png"
-            },
+            // avatar: {
+            //     type: String,
+            //     default: "avatar.png"
+            // },
             comments: {
                 type: [{
                     message: String,
