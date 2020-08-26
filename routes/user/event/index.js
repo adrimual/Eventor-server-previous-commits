@@ -68,7 +68,8 @@ router.get('/getAllEvents', (req, res, next) => {
 //get all future events
 router.get('/getAllFutureEvents', (req, res, next) => {
     Event
-        .find({ startTime: { "$gt": new Date()}})
+        .find({ startTime: { "$gt": new Date() } })
+        .populate('owner')
         .then(response => res.json(response))
         .catch(err => next(err))
 })
