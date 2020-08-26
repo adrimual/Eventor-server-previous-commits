@@ -65,6 +65,13 @@ router.get('/getAllEvents', (req, res, next) => {
         .then(response => res.json(response))
         .catch(err => next(err))
 })
+//get all future events
+router.get('/getAllFutureEvents', (req, res, next) => {
+    Event
+        .find({ startTime: { "$gt": new Date()}})
+        .then(response => res.json(response))
+        .catch(err => next(err))
+})
 
 //get event owner
 router.get('/getOwner/:eventId', (req, res, next) => {
@@ -83,11 +90,19 @@ router.get('/:userId/owned', (req, res, next) => {
         .catch(err => next(err))
 })
 
+// get all future events of a user
+router.get('/:userId/all/future', (req, res, next) => {
+    Event
+        .find({ startTime: { "$gt": new Date() }, participants: { $in: [req.params.userId] } })
+        .then(response => res.json(response.filter(event => event.participants.includes(req.params.userId))))
+        .catch(err => next(err))
+})
+
 // get all events of a user
 router.get('/:userId/all', (req, res, next) => {
     Event
-        .find()
-        .then(response => res.json(response.filter(event => event.participants.includes(req.params.userId))))
+        .find({ participants: { $in: [req.params.userId] } } )
+        .then(response => res.json(response))
         .catch(err => next(err))
 })
 
