@@ -4,4 +4,7 @@ module.exports = app => {
         app.use('/', require('./base'))
         app.use('/api', require('./auth'))
         app.use('/api/user', require('./user'))
+        app.use((req, res) => {
+        res.sendFile(__dirname + "/public/index.html");
+  })
 }
