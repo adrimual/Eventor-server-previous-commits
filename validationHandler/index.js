@@ -18,7 +18,7 @@ class ValidationHandler {
         return true
     }
     isFieldTooLong = (field, res, length, fieldName) => {
-        if (field.length > length) {
+        if (field && field.length >= length) {
             res.status(400).json({
                 message: `The ${fieldName} can only have ${length} characters.`
             })
