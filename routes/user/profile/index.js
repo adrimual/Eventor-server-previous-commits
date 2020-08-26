@@ -13,6 +13,7 @@ const validationHandler = new ValidationHandler()
 //Helper functions 
 const isLoggedIn = (req, res, next) => req.isAuthenticated() ? next() : null;
 const isTheUserAllowed = (req, res, next) => req.user.id === req.params.id ? next() : null;
+const handleErrors = (err, req, res, next) => res.status(500).json({ message: "Oops, something went wrong... try it later :" })
 
 const obtainDetailsUpdate = body => {
     const elementToChange = {...body}
@@ -30,7 +31,7 @@ const isUserFormValid = (model, body, res) => {
 const updateDetails = (id, body) => {
     user.findByIdAndUpdate(id, obtainDetailsUpdate(body), { new: true })
         .then(response => response)
-        .catch(err => console.log(err))
+        .catch(err => next(err))
 }
 //edit username, email and password
 router.put('/edit/:id', isLoggedIn, isTheUserAllowed, (req, res) => {
@@ -55,7 +56,7 @@ router.put('/edit/:id', isLoggedIn, isTheUserAllowed, (req, res) => {
             }
         })
         .then(user=> res.json(user))
-        .catch(err => console.log(err))
+        .catch(err => next(err))
 
 })
 
@@ -65,6 +66,6 @@ router.get('/:id', (req, res) => {
         .findById(req.params.id)
         .populate("personDetails")
         .then(user => res.json(user))
-        .catch(err=>console.log(err))
+        .catch(err => next(err))
 })
 module.exports = router

@@ -2,9 +2,18 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const bcrypt = require('bcrypt');
+
 //calling models
 const User = require('../../models/user.model');
 const Person = require('../../models/person.model');
+
+const handleErrors = (err, req, res, next) => res.status(500).json({
+    status: error,
+    message: "Oops, something went wrong...:("
+})
+const associateDetail = ( propertyValue) => {
+            return { [propertyValue]: response.id }
+}
 
 
 //SIGN-UP
@@ -34,32 +43,36 @@ router.post('/signup', (req, res, next) => {
         }
         const salt = bcrypt.genSaltSync(10);
         const hashPass = bcrypt.hashSync(password, salt);
-
-        const aNewUser = new User({
-            username: username,
-            email: email,
-            password: hashPass
-        });
-        aNewUser.save(err => {
-            if (err) {
-                res.status(400).json({
-                    message: 'Saving user to database went wrong :().'
-                });
-                return;
-            }
-            //hacer login automatico justo despues del signup
-            //con el paquete passport
-            req.login(aNewUser, (err) => {
-                if (err) {
-                    res.status(500).json({ message: 'Login after signup went bad.' });
-                    return;
-                }
-                //enviar la informacion del usuario al frontend
-                res.status(200).json(aNewUser);
-            });
-        });
+        const propertyValue = "personDetails";
+        associateDetail(propertyValue)
+            .then(details => {
+                return new User({
+                    username: username,
+                    email: email,
+                    password: hashPass,
+                    ...details
+                })
+            })
+            .then(aNewUser=>{
+                aNewUser.save(err => {
+                    if (err) {
+                        res.status(400).json({
+                            message: 'Saving user to database went wrong :().'
+                        });
+                        return;
+                    }
+                req.login(aNewUser, (err) => {
+                    if (err) {
+                        res.status(500).json({ message: 'Login after signup went bad.' });
+                        return;
+                    }
+                    res.status(200).json(aNewUser);
+                })
+            })
+            })
+            .catch(err => next(err))
     });
-});
+})
 
 //LOGIN
 router.post('/login', (req, res, next) => {
@@ -70,10 +83,7 @@ router.post('/login', (req, res, next) => {
             });
             return;
         }
-
         if (!theUser) {
-            // "failureDetails" contiene el mensaje de error
-            // que viene de  "LocalStrategy" { message: '...' }.
             res.status(401).json(failureDetails);
             return;
         }
@@ -89,7 +99,7 @@ router.post('/login', (req, res, next) => {
             res.status(200).json(theUser);
         });
     })(req, res, next);
-});
+})
 
 //LOGOUT
 router.post('/logout', (req, res, next) => {
@@ -108,7 +118,8 @@ router.get('/loggedin', (req, res, next) => {
     }
     res.status(403).json({
         message: 'Unauthorized!'
-    });
-});
+    })
+})
+router.use(handleErrors)
 
 module.exports = router
