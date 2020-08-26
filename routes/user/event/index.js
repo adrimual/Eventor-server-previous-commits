@@ -12,14 +12,18 @@ const Event = require('../../../models/event.model')
 
 //Helper functions
 const isFormValidated = (event, res) => {
-    return validationHandler.areRequiredFieldsFilled(event, res, "name", "description", "startTime", "endTime", "city") &&
-        validationHandler.isFieldLongEnough(event.name, res, 2, "name") &&
-        validationHandler.isFieldLongEnough(event.description, res, 40, "description") &&
-        validationHandler.isFieldTooLong(event.description, res, 500, "description") &&
-        validationHandler.isFutureDate(new Date(), event.startTime, res) &&
-        validationHandler.isFutureDate(new Date(event.startTime), event.endTime, res)
+    return validationHandler.isNameUnique(Event, event.name, res)
+        .then(isNameUnique => {
+            return isNameUnique &&
+                validationHandler.areRequiredFieldsFilled(event, res, "name", "description", "startTime", "endTime", "city") &&
+                validationHandler.isFieldLongEnough(event.name, res, 2, "name") &&
+                validationHandler.isFieldTooLong(event.name, res, 40, "name") &&
+                validationHandler.isFieldLongEnough(event.description, res, 40, "description") &&
+                validationHandler.isFieldTooLong(event.description, res, 500, "description") &&
+                validationHandler.isFutureDate(new Date(), event.startTime, res) &&
+                validationHandler.isFutureDate(new Date(event.startTime), event.endTime, res)
+        })
 }
-
 //to join an event
 router.put('/join/:eventId/:userId', (req, res, next) => {
 
@@ -99,11 +103,13 @@ router.get('/:userId/participant', (req, res, next) => {
 
 //Create an Event
 router.post('/create', (req, res, next) => {
-    isFormValidated(req.body, res) &&
-    Event
-        .create(req.body)
-        .then(response => console.log(response.data))
-        .catch(err => next(err))
+    isFormValidated(req.body, res)
+        .then(validated => validated  &&
+            Event
+                .create(req.body)
+                .then(response => console.log(response.data))
+                .catch(err => next(err)))
+        .catch(err=>next(err))
 })
 
 //delete event
@@ -122,20 +128,29 @@ router.get('/event/:userId', (req, res) => {
         .then(response=>res.json(response))
         .catch(err => next(err))
 })
-
-//updating an event
-router.put('/event/:eventId', (req, res, next) => {
-    isFormValidated(req.body, res) &&
+router.get('/event/name/:eventName', (req, res, next) => {
     Event
-        .findByIdAndUpdate(req.params.eventId, req.body, {new:true})
+        .findOne({
+            name: req.params.eventName
+        })
         .then(response => res.json(response))
         .catch(err => next(err))
+})
+//updating an event
+router.put('/event/:eventId', (req, res, next) => {
+    isFormValidated(req.body, res)
+        .then(validated => validated &&
+        Event
+            .findByIdAndUpdate(req.params.eventId, req.body, {new:true})
+            .then(response => res.json(response))
+            .catch(err => next(err)))
+        .catch(err=>next(err))    
 })
 
 //get all events of a person
 router.get('/:userId', (req, res, next)=> {
     Event
-        .find( {owner: req.params.userId})
+        .find({owner: req.params.userId})
         .then(response => res.json(response))
         .catch(err => next(err))
 })
