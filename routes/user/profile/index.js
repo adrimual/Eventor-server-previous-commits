@@ -40,15 +40,16 @@ const updateDetails = (id, body, user) => {
 }
 //edit username, email and password
 router.put('/edit/:id', (req, res) => {
-    const {username, email, password} = req.body
+    const {username, email, password, avatar} = req.body
     User
         .findById(req.params.id)
         .then(user => {
             user.username = username;
             user.email = email;
-            if (password != "") {
-                const salt = bcrypt.genSaltSync(bcryptSalt)
+            if (password !== "") {
+                const salt = bcrypt.genSaltSync(bcryptSalt);
                 user.password = bcrypt.hashSync(password, salt);
+                user.avatar = avatar;
             }
             user.save()
             return user
