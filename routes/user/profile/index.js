@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const bcrypt = require("bcrypt")
 const bcryptSalt = 10
-
+const passport = require("passport")
 //Models
 const User = require('../../../models/user.model')
 const Person = require('../../../models/person.model')
@@ -11,6 +11,8 @@ const validationHandler = new ValidationHandler()
 
 
 //Helper functions 
+const isLoggedIn = (req, res, next) => req.isAuthenticated() ? next() : null;
+const isTheUserAllowed = (req, res, next) => req.user.id === req.params.id ? next() : null;
 
 const obtainDetailsUpdate = body => {
     const elementToChange = {...body}
@@ -31,7 +33,7 @@ const updateDetails = (id, body) => {
         .catch(err => console.log(err))
 }
 //edit username, email and password
-router.put('/edit/:id', (req, res) => {
+router.put('/edit/:id', isLoggedIn, isTheUserAllowed, (req, res) => {
     const {username, email, password, avatar} = req.body
     User
         .findById(req.params.id)
