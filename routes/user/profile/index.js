@@ -28,7 +28,7 @@ const isUserFormValid = (model, body, res) => {
     }
     return true
 }
-const updateDetails = (id, body) => {
+const updateDetails = (id, body, next) => {
     user.findByIdAndUpdate(id, obtainDetailsUpdate(body), { new: true })
         .then(response => response)
         .catch(err => next(err))
@@ -51,7 +51,7 @@ router.put('/edit/:id', isLoggedIn, isTheUserAllowed, (req, res) => {
         }) 
         .then(details => {
             if (isUserFormValid(details.model, req.body, res)) {
-                updateDetails(details.id, req.body, details.model)
+                updateDetails(details.id, req.body, details.model, next)
                 return details.user
             }
         })
