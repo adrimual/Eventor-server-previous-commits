@@ -28,6 +28,7 @@ const isFormValidated = (event, res, eventId) => {
                 validationHandler.isFutureDate(new Date(), event.startTime, res) &&
                 validationHandler.isFutureDate(new Date(event.startTime), event.endTime, res)
         })
+        .catch(err => next(err))
 }
 //to join an event
 router.put('/join/:eventId/:id', isLoggedIn, isTheUserAllowed, (req, res, next) => {
@@ -118,11 +119,14 @@ router.get('/:userId/participant', (req, res, next) => {
 //Create an Event
 router.post('/create', isLoggedIn, isTheUserAllowed, (req, res, next) => {
     isFormValidated(req.body, res)
-        .then(validated => validated  &&
-            Event
-                .create(req.body)
-                .then(() => res.json(''))
-                .catch(err => next(err)))
+        .then(validated => {
+            if (validated) {
+                Event
+                    .create(req.body)
+                    .then(() => res.json('created'))
+                    .catch(err => next(err))
+            }
+        })
         .catch(err=>next(err))
 })
 
