@@ -56,4 +56,12 @@ class ValidationHandler {
         .catch(err => console.log(err))
     }
 }
+
+    isLocationSelected = (location, res) => {
+        if (location.address.length === 0 || location.coordinates.lat.length === 0 || location.coordinates.lng.length === 0 ) {
+            res.status(400).json({ message: `Select a valid address.` })
+            return false
+        }
+        return true
+    }
 module.exports = ValidationHandler
