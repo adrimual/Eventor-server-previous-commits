@@ -15,7 +15,7 @@ require('./configs/preformatter.config')(app)
 require('./configs/middleware.config')(app)
 require('./configs/passport.config')(app)
 require('./configs/views.configs')(app)
-require('./configs/cloudinary.config')(app)
+require('./configs/cloudinary.config')
 require('./configs/mongoose.config')
 
 

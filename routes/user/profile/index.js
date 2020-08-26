@@ -5,7 +5,7 @@ const bcryptSalt = 10
 
 //Models
 const User = require('../../../models/user.model')
-// const Person = require('../../../models/person.model')
+const Person = require('../../../models/person.model')
 const ValidationHandler = require("../../../validationHandler")
 const validationHandler = new ValidationHandler()
 
@@ -13,27 +13,19 @@ const validationHandler = new ValidationHandler()
 //Helper functions 
 
 const obtainDetailsUpdate = body => {
-    const elementToChange = {
-        ...body
-    }
+    const elementToChange = {...body}
     delete elementToChange.username
     delete elementToChange.email
     delete elementToChange.password
     return elementToChange
 }
 const isUserFormValid = (model, body, res) => {
-    if (model == Person && !validationHandler.areRequiredFieldsFilled(body, res, "interests")) {
-        return false
-    }
-    if (model == Company && !validationHandler.isFieldTooLong(body.description, res, 500, "description")) {
-        return false
-    }
-    if (model == Company && !validationHandler.isFieldLongEnough(body.address, res, 8, "address")) {
+    if (model == Person && !validationHandler.areRequiredFieldsFilled(body, res)) {
         return false
     }
     return true
 }
-const updateDetails = (id, body, user) => {
+const updateDetails = (id, body) => {
     user.findByIdAndUpdate(id, obtainDetailsUpdate(body), { new: true })
         .then(response => response)
         .catch(err => console.log(err))
@@ -69,7 +61,7 @@ router.put('/edit/:id', (req, res) => {
 router.get('/:id', (req, res) => {
     User
         .findById(req.params.id)
-        .populate(details.Person)
+        .populate("personDetails")
         .then(user => res.json(user))
         .catch(err=>console.log(err))
 })
