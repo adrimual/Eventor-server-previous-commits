@@ -1,6 +1,5 @@
 class ValidationHandler {
     areRequiredFieldsFilled = (body, res, ...fields) => {
-        console.log(body)
         const pendingFields = fields.filter(field => !body[field] && body[field].length == 0 || body[field] == 0)
         if (pendingFields.length > 0) {
             res.status(400).json({ message: `The following fields are required: ${pendingFields.join(', ')}.` })

@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
+const passport = require("passport")
+const { ensureLoggedIn, ensureLoggedOut } = require("connect-ensure-login")
 
 const ValidationHandler = require("../../../validationHandler")
 const validationHandler = new ValidationHandler()
@@ -11,6 +13,10 @@ const Person = require('../../../models/person.model')
 const Event = require('../../../models/event.model')
 
 //Helper functions
+
+const isLoggedIn = (req, res, next) =>  req.isAuthenticated() ? next() : null
+
+const isTheUserAllowed = (req, res, next) => req.user.id === req.params.id ? next() : null
 const isFormValidated = (event, res) => {
     return validationHandler.isNameUnique(Event, event.name, res)
         .then(isNameUnique => {
@@ -41,7 +47,6 @@ router.put('/join/:eventId/:userId', (req, res, next) => {
 })
 //to leave an event
 router.put('/leave/:eventId/:userId', (req, res, next) => {
-
     Event
         .findById(req.params.eventId, {participants: 1})
         .then(event => {
@@ -65,7 +70,6 @@ router.get('/getAllEvents', (req, res, next) => {
 
 //get event owner
 router.get('/getOwner/:eventId', (req, res, next) => {
-
     Event
         .findById(req.params.eventId)
         .populate('owner')
@@ -102,7 +106,7 @@ router.get('/:userId/participant', (req, res, next) => {
 })
 
 //Create an Event
-router.post('/create', (req, res, next) => {
+router.post('/create', isLoggedIn, isTheUserAllowed, (req, res, next) => {
     isFormValidated(req.body, res)
         .then(validated => validated  &&
             Event
