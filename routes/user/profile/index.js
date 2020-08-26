@@ -46,10 +46,10 @@ router.put('/edit/:id', (req, res) => {
         .then(user => {
             user.username = username;
             user.email = email;
+            user.avatar = avatar;
             if (password !== "") {
                 const salt = bcrypt.genSaltSync(bcryptSalt);
                 user.password = bcrypt.hashSync(password, salt);
-                user.avatar = avatar;
             }
             user.save()
             return user
