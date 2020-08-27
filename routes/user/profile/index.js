@@ -41,7 +41,7 @@ router.put('/edit/:id', isLoggedIn, isTheUserAllowed, (req, res) => {
         .then(user => {
             user.username = username;
             user.email = email;
-            user.avatar = avatar;
+            avatar !== null ? user.avatar = avatar : null
             if (password !== "") {
                 const salt = bcrypt.genSaltSync(bcryptSalt);
                 user.password = bcrypt.hashSync(password, salt);
