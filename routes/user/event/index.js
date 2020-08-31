@@ -69,7 +69,7 @@ router.get('/getAllEvents', (req, res, next) => {
 //get all future events
 router.get('/getAllFutureEvents', (req, res, next) => {
     Event
-        .find({ startTime: { "$gte": new Date() } })
+        .find({ endTime: { "$gte": new Date() } })
         .populate('owner')
         .then(response => res.json(response))
         .catch(err => next(err))
@@ -95,7 +95,7 @@ router.get('/:userId/owned', (req, res, next) => {
 // get all future events of a user
 router.get('/:userId/all/future', (req, res, next) => {
     Event
-        .find({ startTime: { "$gt": new Date() }, participants: { $in: [req.params.userId] } })
+        .find({ endTime: { "$gte": new Date() }, participants: { $in: [req.params.userId] } })
         .then(response => res.json(response))
         .catch(err => next(err))
 })
