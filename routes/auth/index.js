@@ -1,125 +1,112 @@
-const express = require('express');
-const router = express.Router();
-const passport = require('passport');
-const bcrypt = require('bcrypt');
+const express = require("express")
+const router = express.Router()
+const passport = require("passport")
 
-//calling models
-const User = require('../../models/user.model');
-const Person = require('../../models/person.model');
-
-const handleErrors = (err, req, res, next) => res.status(500).json({
-    status: error,
-    message: "Oops, something went wrong...:("
-})
-const associateDetail = ( propertyValue) => {
-            return { [propertyValue]: response.id }
-}
+const User = require("../models/User.model")
+const bcrypt = require("bcrypt")
 
 
-//SIGN-UP
+
 router.post('/signup', (req, res, next) => {
-    const { username, password } = req.body
+
+    const username = req.body.username
+    const password = req.body.password
+    const userMotorbike = req.body.userMotorbike
     
+
     if (!username || !password) {
-        res.status(400).json({ message: 'Provide username and password' });
-        return;
+        res.status(400).json({ message: 'Introduce username or password' })
+        return
     }
+
     if (password.length < 4) {
-        res.status(400).json({
-            message: 'Please make your password at least 4 characters long.'
-        });
-        return;
+        res.status(400).json({ message: 'Please, provide a password with four characters or more ^^.' });
+        return
     }
+
     User.findOne({ username }, (err, foundUser) => {
+
         if (err) {
-            res.status(500).json({ message: "Username check went bad :()." });
-            return;
+            res.status(500).json({ message: "User not found" })
+            return
         }
+
         if (foundUser) {
-            res.status(400).json({
-                message: 'Username taken. Choose another one, please ^^.'
-            });
-            return;
+            res.status(400).json({ message: 'User already taken, please use another one' })
+            return
         }
+
         const salt = bcrypt.genSaltSync(10);
-        const hashPass = bcrypt.hashSync(password, salt);
-        const propertyValue = "personDetails";
-        associateDetail(propertyValue)
-            .then(details => {
-                return new User({
-                    username: username,
-                    email: email,
-                    password: hashPass,
-                    ...details
-                })
+        const hashPass = bcrypt.hashSync(password, salt)
+
+        const aNewUser = new User({
+            username: username,
+            password: hashPass,
+            userMotorbike: userMotorbike
+        })
+
+        aNewUser.save(err => {
+            if (err) {
+                res.status(400).json({ message: "Couldn't save user in the database" });
+                return
+            }
+
+            // Automatically log in user after sign up
+            // .login() here is actually predefined passport method
+            req.login(aNewUser, (err) => {
+
+                if (err) {
+                    res.status(500).json({ message: "Couldn't initiate session after creating the user" })
+                    return
+                }
+
+                // Send the user's information to the frontend
+                // We can use also: res.status(200).json(req.user);
+                res.status(200).json(aNewUser)
             })
-            .then(aNewUser=>{
-                aNewUser.save(err => {
-                    if (err) {
-                        res.status(400).json({
-                            message: 'Saving user to database went wrong :().'
-                        });
-                        return;
-                    }
-                req.login(aNewUser, (err) => {
-                    if (err) {
-                        res.status(500).json({ message: 'Login after signup went bad.' });
-                        return;
-                    }
-                    res.status(200).json(aNewUser);
-                })
-            })
-            })
-            .catch(err => next(err))
-    });
+        })
+    })
 })
 
-//LOGIN
 router.post('/login', (req, res, next) => {
     passport.authenticate('local', (err, theUser, failureDetails) => {
         if (err) {
-            res.status(500).json({
-                message: 'Something went wrong authenticating user :('
-            });
-            return;
+            res.status(500).json({ message: 'Wrong user or password.' })
+            return
         }
+
         if (!theUser) {
+            // "failureDetails" contains the error messages
+            // from our logic in "LocalStrategy" { message: '...' }.
             res.status(401).json(failureDetails);
-            return;
+            return
         }
 
         // save user in session
         req.login(theUser, (err) => {
             if (err) {
-                res.status(500).json({
-                    message: 'Session save went bad :().'
-                });
-                return;
+                res.status(500).json({ message: "The session couldn't be saved" })
+                return
             }
-            res.status(200).json(theUser);
-        });
-    })(req, res, next);
+
+            // We are now logged in (that's why we can also send req.user)
+            res.status(200).json(theUser)
+        })
+    })(req, res, next)
 })
 
-//LOGOUT
 router.post('/logout', (req, res, next) => {
-    // req.logout() metodo predefinido de passport
-    req.logout();
-    res.status(200).json({
-        message: 'Log out successful!'
-    });
-});
+    // req.logout() is defined by passport
+    req.logout()
+    res.status(200).json({ message: 'Session closed' })
+})
 
-//verificacion si esta logueado
 router.get('/loggedin', (req, res, next) => {
     if (req.isAuthenticated()) {
-        res.status(200).json(req.user);
-        return;
+        res.status(200).json(req.user)
+        return
     }
-    res.status(403).json({
-        message: 'Unauthorized!'
-    })
+    res.status(403).json({ message: 'Unauthorized!' })
 })
-router.use(handleErrors)
 
 module.exports = router

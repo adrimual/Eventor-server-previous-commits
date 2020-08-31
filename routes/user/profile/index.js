@@ -18,7 +18,6 @@ const handleErrors = (err, req, res, next) => res.status(500).json({ message: "O
 const obtainDetailsUpdate = body => {
     const elementToChange = {...body}
     delete elementToChange.username
-    delete elementToChange.email
     delete elementToChange.password
     return elementToChange
 }
@@ -33,14 +32,13 @@ const updateDetails = (id, body, next) => {
         .then(response => response)
         .catch(err => next(err))
 }
-//edit username, email and password
+//edit username and password
 router.put('/edit/:id', isLoggedIn, isTheUserAllowed, (req, res) => {
-    const {username, email, password, avatar} = req.body
+    const {username, password, avatar} = req.body
     User
         .findById(req.params.id)
         .then(user => {
             user.username = username;
-            user.email = email;
             avatar !== null ? user.avatar = avatar : null
             if (password !== "") {
                 const salt = bcrypt.genSaltSync(bcryptSalt);

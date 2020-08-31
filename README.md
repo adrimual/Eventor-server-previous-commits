@@ -94,11 +94,6 @@ User model
         minlength: 3,
         maxlength: 20
     },
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
     password: {
         type: String,
         required: true,
