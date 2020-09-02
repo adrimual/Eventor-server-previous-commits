@@ -15,12 +15,9 @@ require('./configs/preformatter.config')(app)
 require('./configs/middleware.config')(app)
 require('./configs/passport.config')(app)
 require('./configs/views.configs')(app)
-require('./configs/cloudinary.config')
-require('./configs/mongoose.config')
-
+require('./configs/locals.config')(app)
 
 // Routes index
 require('./routes')(app)
-
 
 module.exports = app

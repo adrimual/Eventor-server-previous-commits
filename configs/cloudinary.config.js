@@ -14,11 +14,10 @@ const storage = cloudinaryStorage({
     folder: 'avatar',
     allowedFormats: ['jpg', 'png'],
     filename: function (req, res, cb) {
-        cb(null, res.originalname);
+        let fileName = res.originalname.split(".");
+        cb(null, fileName[0]);
     }
 });
 
-const uploader = multer({
-    storage
-});
+const uploader = multer({storage});
 module.exports = uploader;

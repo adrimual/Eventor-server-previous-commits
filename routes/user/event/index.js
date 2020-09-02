@@ -7,8 +7,7 @@ const ValidationHandler = require("../../../validationHandler")
 const validationHandler = new ValidationHandler()
 
 //Models
-const User = require('../../../models/user.model')
-const Person = require('../../../models/person.model')
+
 const Event = require('../../../models/event.model')
 
 //Helper functions

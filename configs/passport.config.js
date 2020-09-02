@@ -3,15 +3,14 @@ const bcrypt = require("bcrypt")
 const passport = require("passport")
 const LocalStrategy = require("passport-local").Strategy
 const flash = require("connect-flash")
-
 const User = require('../models/user.model')
 
 module.exports = app => {
 
     app.use(session({
-        secret: "go-ride",
+        secret: process.env.SESSION_SECRET,
         resave: true,
-        saveUninitialized: true
+        saveUninitialized: true,
     }))
 
     passport.serializeUser((user, next) => next(null, user._id))
@@ -20,8 +19,6 @@ module.exports = app => {
             .then(theUser => next(null, theUser))
             .catch(err => next(err))
     })
-
-
 
     app.use(flash())
 

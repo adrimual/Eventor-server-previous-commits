@@ -2,18 +2,15 @@ const express = require("express")
 const router = express.Router()
 const passport = require("passport")
 
-const User = require("../models/User.model")
+const User = require("../../models/user.model")
 const bcrypt = require("bcrypt")
-
 
 
 router.post('/signup', (req, res, next) => {
 
     const username = req.body.username
     const password = req.body.password
-    const userMotorbike = req.body.userMotorbike
     
-
     if (!username || !password) {
         res.status(400).json({ message: 'Introduce username or password' })
         return
@@ -41,8 +38,7 @@ router.post('/signup', (req, res, next) => {
 
         const aNewUser = new User({
             username: username,
-            password: hashPass,
-            userMotorbike: userMotorbike
+            password: hashPass
         })
 
         aNewUser.save(err => {

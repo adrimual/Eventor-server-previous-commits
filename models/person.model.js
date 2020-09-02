@@ -10,12 +10,9 @@ const personSchema = new Schema({
                 type: String,
                 enum: ['Male', 'Female']
             },
-            vehicle: {
-                type: [String],
-                enum: ["motorbike, car"],
-                minlength: 1,
-            },
             calendar: [Date],
+}, {
+    timestamps:true
 })
 
 const Person = mongoose.model("Person", personSchema);
