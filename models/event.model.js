@@ -10,20 +10,6 @@ const eventSchema = new Schema({
                 minlength: 2,
                 unique: true,
             },
-            comments: {
-                type: [{
-                    message: String,
-                    owner: {
-                        type: Schema.Types.ObjectId,
-                        ref: "User"
-                    }
-                }],
-                default: []
-            },
-            pictures: {
-                type: [String],
-                default: []
-            },
             description: {
                 type: String,
                 required: true,

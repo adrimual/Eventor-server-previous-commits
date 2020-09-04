@@ -2,10 +2,9 @@ const express = require('express')
 const router = express.Router()
 const bcrypt = require("bcrypt")
 const bcryptSalt = 10
-const passport = require("passport")
 //Models
 const User = require('../../../models/user.model')
-const Person = require('../../../models/person.model')
+
 const ValidationHandler = require("../../../validationHandler")
 const validationHandler = new ValidationHandler()
 
@@ -21,48 +20,31 @@ const obtainDetailsUpdate = body => {
     delete elementToChange.password
     return elementToChange
 }
-const isUserFormValid = (model, body, res) => {
-    if (model == Person && !validationHandler.areRequiredFieldsFilled(body, res)) {
+const isUserFormValid = (body, res) => {
+    if (!validationHandler.areRequiredFieldsFilled(body, res)) {
         return false
     }
     return true
 }
-const updateDetails = (id, body, next) => {
-    user.findByIdAndUpdate(id, obtainDetailsUpdate(body), { new: true })
-        .then(response => response)
-        .catch(err => next(err))
-}
+
 //edit username and password
-router.put('/edit/:id', isLoggedIn, isTheUserAllowed, (req, res) => {
-    const {username, password, avatar} = req.body
+router.put('/edit/:id', isLoggedIn, isTheUserAllowed, (req, res, next) => {
+    const { username, password, avatar, age, genre } = req.body;
+    let hashedPassword;
+    if (password !== "") {
+        const salt = bcrypt.genSaltSync(bcryptSalt);
+       hashedPassword = bcrypt.hashSync(password, salt);
+    }
     User
-        .findById(req.params.id)
-        .then(user => {
-            user.username = username;
-            avatar !== null ? user.avatar = avatar : null
-            if (password !== "") {
-                const salt = bcrypt.genSaltSync(bcryptSalt);
-                user.password = bcrypt.hashSync(password, salt);
-            }
-            user.save()
-            return user
-        }) 
-        .then(details => {
-            if (isUserFormValid(details.model, req.body, res)) {
-                updateDetails(details.id, req.body, details.model, next)
-                return details.user
-            }
-        })
+        .findByIdAndUpdate(req.params.id, {username, password: hashedPassword, avatar, age, genre}, {new: true})
         .then(user=> res.json(user))
         .catch(err => next(err))
-
 })
 
 // get user details
-router.get('/:id', (req, res) => {
+router.get('/:id', (req, res, next) => {
     User
         .findById(req.params.id)
-        .populate("personDetails")
         .then(user => res.json(user))
         .catch(err => next(err))
 })

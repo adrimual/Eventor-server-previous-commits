@@ -11,7 +11,11 @@ module.exports = app => {
         secret: process.env.SESSION_SECRET,
         resave: true,
         saveUninitialized: true,
-    }))
+        cookie: {
+            maxAge: 24 * 600 * 60 * 1000
+        }
+    })
+    )
 
     passport.serializeUser((user, next) => next(null, user._id))
     passport.deserializeUser((id, next) => {

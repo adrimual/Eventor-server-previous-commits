@@ -15,12 +15,18 @@ const userSchema = new Schema({
     },
     avatar: {
         type: String,
-        default: "https://res.cloudinary.com/dlsnvevxk/image/upload/v1595681654/avatar/profile%20icon.png.png"
+        default: "https://res.cloudinary.com/dlsnvevxk/image/upload/v1595681654/avatar/profile%20icon.png.png",
+        required: true
     },
-    personDetails: {
-        type: Schema.Types.ObjectId,
-        ref: "Person"
-    }
+    age: {
+           type: Number,
+           min: 18
+       },
+    genre: {
+           type: String,
+           enum: ['Male', 'Female']
+       },
+    calendar: [Date],
 }, {
     timestamps: true
 })

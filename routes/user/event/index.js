@@ -1,7 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const mongoose = require('mongoose')
-const passport = require("passport")
+
 
 const ValidationHandler = require("../../../validationHandler")
 const validationHandler = new ValidationHandler()
@@ -15,6 +14,7 @@ const Event = require('../../../models/event.model')
 const isLoggedIn = (req, res, next) =>  req.isAuthenticated() ? next() : null
 
 const isTheUserAllowed = (req, res, next) => req.user.id === req.params.id ? next() : null
+const handleErrors = (err, req, res, next) => res.status(500).json({ message: "Oops, something went wrong... try it later :" })
 const isFormValidated = (event, res, eventId) => {
     return validationHandler.isNameUnique(Event, event.name, res, eventId)
         .then(isNameUnique => {
@@ -27,6 +27,12 @@ const isFormValidated = (event, res, eventId) => {
                 validationHandler.isFutureDate(new Date(), event.startTime, res) &&
                 validationHandler.isFutureDate(new Date(event.startTime), event.endTime, res)
         })
+        .catch(err => next(err))
+}
+
+const deleteEventDetails = (res, eventId) => {
+    Event.findByIdAndRemove(eventId)
+        .then(deleteDetails => res.json(deleteDetails))
         .catch(err => next(err))
 }
 //to join an event
@@ -116,7 +122,7 @@ router.get('/:userId/participant', (req, res, next) => {
 })
 
 //Create an Event
-router.post('/create', isLoggedIn, isTheUserAllowed, (req, res, next) => {
+router.post('/create/:id', isLoggedIn, isTheUserAllowed, (req, res, next) => {
     isFormValidated(req.body, res)
         .then(validated => {
             if (validated) {
@@ -130,18 +136,18 @@ router.post('/create', isLoggedIn, isTheUserAllowed, (req, res, next) => {
 })
 
 //delete event
-router.delete('/delete/:id', isLoggedIn, isTheUserAllowed, (req, res, next) => {
+router.delete('/delete/:eventId/:id', isLoggedIn, isTheUserAllowed, (req, res, next) => {
     Event
-        .findByIdAndRemove(req.params.id)
-        .then(() => res.json(''))
+        .findById(req.params.eventId)
+        .then(() => deleteEventDetails(res, req.params.eventId))
         .catch(err => next(err))
 })
 
 //get an event
-router.get('/event/:userId', (req, res) => {
+router.get('/event/:userId', (req, res, next) => {
     Event
         .findById(req.params.userId)
-        .populate('owner')
+        .populate('participants')
         .then(response=>res.json(response))
         .catch(err => next(err))
 })
@@ -149,9 +155,7 @@ router.get('/event/:userId', (req, res) => {
 //Get an event by name
 router.get('/event/name/:eventName', (req, res, next) => {
     Event
-        .findOne({
-            name: req.params.eventName
-        })
+        .findOne({name: req.params.eventName})
         .then(response => res.json(response))
         .catch(err => next(err))
 })
@@ -163,8 +167,10 @@ router.put('/event/:eventId/:id', isLoggedIn, isTheUserAllowed, (req, res, next)
         Event
             .findByIdAndUpdate(req.params.eventId, req.body, {new:true})
             .then(response => res.json(response))
-            .catch(err => next(err)))
-        .catch(err=>next(err))    
+            .catch(err => next(err))
+        )
+        .catch(err=>next(err))  
+              
 })
 
 //get all events of a person
@@ -174,5 +180,5 @@ router.get('/:userId', (req, res, next)=> {
         .then(response => res.json(response))
         .catch(err => next(err))
 })
-
+router.use(handleErrors)
 module.exports = router
