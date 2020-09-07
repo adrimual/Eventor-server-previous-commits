@@ -10,9 +10,9 @@ const validationHandler = new ValidationHandler()
 
 
 //Helper functions 
-const isLoggedIn = (req, res, next) => req.isAuthenticated() ? next() : null;
+const isLoggedIn = (req, res, next) => req.isAuthenticated() ? next() : res.redirect('/login');
 const isTheUserAllowed = (req, res, next) => req.user.id === req.params.id ? next() : null;
-const handleErrors = (err, req, res, next) => res.status(500).json({ message: "Oops, something went wrong... try it later :" })
+
 
 const obtainDetailsUpdate = body => {
     const elementToChange = {...body}
@@ -30,16 +30,22 @@ const isUserFormValid = (body, res) => {
 //edit username and password
 router.put('/edit/:id', isLoggedIn, isTheUserAllowed, (req, res, next) => {
     const { username, password, avatar, age, genre } = req.body;
-    let hashedPassword;
-    if (password !== "") {
-        const salt = bcrypt.genSaltSync(bcryptSalt);
-       hashedPassword = bcrypt.hashSync(password, salt);
-    }
     User
-        .findByIdAndUpdate(req.params.id, {username, password: hashedPassword, avatar, age, genre}, {new: true})
-        .then(user=> res.json(user))
-        .catch(err => next(err))
-})
+        .findById(req.params.id, password)
+        .then(pwd => {
+            let hashedPassword = pwd;
+            if (password !== "") {
+                const salt = bcrypt.genSaltSync(bcryptSalt);
+                hashedPassword = bcrypt.hashSync(password, salt);
+            }
+            User
+                .findByIdAndUpdate(req.params.id, {username, password: hashedPassword, avatar, age, genre}, {new: true})
+                .then(user=> res.json(user))
+                .catch(err => next(err))
+        })
+        .catch(err => console.log(err))
+    }
+  )
 
 // get user details
 router.get('/:id', (req, res, next) => {
