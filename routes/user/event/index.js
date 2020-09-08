@@ -129,7 +129,7 @@ router.post('/create/:id', isLoggedIn, isTheUserAllowed, (req, res, next) => {
                 Event
                     .create(req.body)
                     .then(() => res.json('created'))
-                    .catch(err => next(err))
+                    .catch(err => console.log("error",err))
             }
         })
         .catch(err=>next(err))
